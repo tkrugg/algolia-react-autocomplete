@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import CancelablePromise from 'cancelable-promise';
@@ -7,35 +7,6 @@ const cancelable = promise =>
   new CancelablePromise((resolve, reject) => {
     promise.then(resolve).catch(reject);
   });
-
-class Hit extends React.PureComponent {
-  static propTypes = {
-    hit: PropTypes.object.isRequired,
-    isSelected: PropTypes.bool.isRequired,
-    indexName: PropTypes.string.isRequired,
-    onClick: PropTypes.func.isRequired,
-    children: PropTypes.node,
-  };
-
-  // this callback here is the only reason I've made a separate Hit component here
-  onClick = () => this.props.onClick(this.props.hit, this.props.indexName);
-
-  render() {
-    const { hit, isSelected } = this.props;
-    return (
-      <div
-        className={classnames({ 'aa-suggestion': true, selected: isSelected })}
-        role="option"
-        key={hit.objectID}
-        id={hit.objectID}
-        onClick={this.onClick}
-        aria-selected={isSelected}
-      >
-        {this.props.children}
-      </div>
-    )
-  }
-}
 
 class Hits extends React.PureComponent {
   static propTypes = {
@@ -87,17 +58,20 @@ class Hits extends React.PureComponent {
   renderHit = hit => {
     const { index: { source, templates, displayKey } } = this.props;
     const isSelected = this.props.selected === hit.objectID;
-    let children = <Fragment>{hit[displayKey]}</Fragment>
-    if (templates && templates.suggestion) {
-      children = templates.suggestion(hit, isSelected)
-    }
 
     return (
-      <Hit key={hit.objectID} hit={hit} onClick={this.props.onClick} isSelected={isSelected}
-           indexName={source.indexName}>
-        {children}
-      </Hit>
-    );
+      <div
+        key={hit.objectID}
+        className={classnames({ 'aa-suggestion': true, selected: isSelected })}
+        role="option"
+        id={hit.objectID}
+        onClick={() => this.props.onClick(hit, source.indexName)}
+        aria-selected={isSelected}
+      >
+        {templates && templates.suggestion ? templates.suggestion(hit, isSelected) : hit[displayKey]}
+      </div>
+    )
+
   };
 
   render() {
