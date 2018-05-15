@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import CancelablePromise from 'cancelable-promise';
@@ -87,7 +87,7 @@ class Hits extends React.PureComponent {
   renderHit = hit => {
     const { index: { source, templates, displayKey } } = this.props;
     const isSelected = this.props.selected === hit.objectID;
-    let children = hit[displayKey]
+    let children = <Fragment>{hit[displayKey]}</Fragment>
     if (templates && templates.suggestion) {
       children = templates.suggestion(hit, isSelected)
     }
