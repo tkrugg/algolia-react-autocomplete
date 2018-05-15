@@ -1,6 +1,6 @@
 {
   "name": "algolia-react-autocomplete",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React base autocomplete for algolia api",
   "main": "build/index.js",
   "scripts": {
