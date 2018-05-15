@@ -1,31 +1,61 @@
-import React from "react";
-import PropTypes from "prop-types";
-import classnames from "classnames";
-import CancelablePromise from "cancelable-promise";
+import React from 'react';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
+import CancelablePromise from 'cancelable-promise';
 
 const cancelable = promise =>
   new CancelablePromise((resolve, reject) => {
     promise.then(resolve).catch(reject);
   });
 
+class Hit extends React.PureComponent {
+  static propTypes = {
+    hit: PropTypes.object.isRequired,
+    isSelected: PropTypes.bool.isRequired,
+    indexName: PropTypes.string.isRequired,
+    onClick: PropTypes.func.isRequired,
+    children: PropTypes.node,
+  };
+
+  // this callback here is the only reason I've made a separate Hit component here
+  onClick = () => this.props.onClick(this.props.hit, this.props.indexName);
+
+  render() {
+    const { hit, isSelected } = this.props;
+    return (
+      <div
+        className={classnames({ 'aa-suggestion': true, selected: isSelected })}
+        role="option"
+        key={hit.objectID}
+        id={hit.objectID}
+        onClick={this.onClick}
+        aria-selected={isSelected}
+      >
+        {this.props.children}
+      </div>
+    )
+  }
+}
+
 class Hits extends React.PureComponent {
   static propTypes = {
     index: PropTypes.shape({
       source: PropTypes.shape({
-        indexName: PropTypes.string.isRequired
+        indexName: PropTypes.string.isRequired,
       }).isRequired,
+      displayKey: PropTypes.string.isRequired,
       template: PropTypes.shape({
         header: PropTypes.func,
-        suggestion: PropTypes.func // TODO: check props inside
-      })
+        suggestion: PropTypes.func, // TODO: check props inside
+      }),
     }).isRequired,
     selected: PropTypes.string,
     onSuggestions: PropTypes.func.isRequired,
-    onClick: PropTypes.func.isRequired
+    onClick: PropTypes.func.isRequired,
   };
 
   state = {
-    hits: []
+    hits: [],
   };
 
   componentWillReceiveProps({ query }) {
@@ -55,21 +85,18 @@ class Hits extends React.PureComponent {
   }
 
   renderHit = hit => {
-    const { index: { source, templates } } = this.props;
+    const { index: { source, templates, displayKey } } = this.props;
     const isSelected = this.props.selected === hit.objectID;
+    let children = hit[displayKey]
+    if (templates && templates.suggestion) {
+      children = templates.suggestion(hit, isSelected)
+    }
+
     return (
-      <div
-        className={classnames({ "aa-suggestion": true, selected: isSelected })}
-        role="option"
-        key={hit.objectID}
-        id={hit.objectID}
-        onClick={() => this.props.onClick(hit, source.indexName)}
-        aria-selected={isSelected}
-      >
-        {templates && templates.suggestion
-          ? templates.suggestion(hit, isSelected)
-          : hit.name}
-      </div>
+      <Hit key={hit.objectID} hit={hit} onClick={this.props.onClick} isSelected={isSelected}
+           indexName={source.indexName}>
+        {children}
+      </Hit>
     );
   };
 
