@@ -40,12 +40,9 @@ $ cd algolia-react-autocomplete
 $ npm i
 $ npm start
 ```
+There is a demo hosted here: https://codesandbox.io/s/kk4v5nqrz5
 
 ## FAQ
-
-### It doesn't work
-Okay.
-Don't forget to throw in an `<input key="input" />` as a direct child.
 
 ### why do I have to install algoliasearch myself, can't I just pass in my credentials inside the component
 You're right. This component makes assumptions on the algolia sdk it's being passed, embedding the lib is safer.

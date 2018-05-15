@@ -58,7 +58,6 @@ class Hits extends React.PureComponent {
   renderHit = hit => {
     const { index: { source, templates, displayKey } } = this.props;
     const isSelected = this.props.selected === hit.objectID;
-
     return (
       <div
         key={hit.objectID}
